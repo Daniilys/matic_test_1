@@ -43,9 +43,9 @@ public class CombinationSearcher {
 
 		TreeNode treeRoot = new TreeNode(-1, "");
 		createChildren(target, dictionary, treeRoot, 0);
-		ArrayList<String> lCombinations = new ArrayList<>();
-		getCombinations(target.length(), treeRoot, new StringBuilder(), lCombinations);
-		return lCombinations;
+		ArrayList<String> combinations = new ArrayList<>();
+		getCombinations(target.length(), treeRoot, new StringBuilder(), combinations);
+		return combinations;
 	}
 
 	private void createChildren(final String target, final Set<String> dictionary, final TreeNode parent, final int start) {
