@@ -6,12 +6,12 @@ import java.util.List;
 /**
  * Created by mahasamatman on 05/12/16.
  */
-public class Tree {
+public class TreeNode {
 	private final int start;
 	private final String value;
-	private final List<Tree> children = new LinkedList<>();
+	private final List<TreeNode> children = new LinkedList<>();
 
-	public Tree(final int start, final String value) {
+	public TreeNode(final int start, final String value) {
 		this.start = start;
 		this.value = value;
 	}
@@ -28,11 +28,11 @@ public class Tree {
 		return value;
 	}
 
-	public void addChild(Tree child) {
+	public void addChild(TreeNode child) {
 		children.add(child);
 	}
 
-	public List<Tree> getChildren() {
+	public List<TreeNode> getChildren() {
 		return children;
 	}
 
@@ -40,21 +40,22 @@ public class Tree {
 		return children.isEmpty();
 	}
 
-	public List<Tree> findChildrenAt(final int start) {
+	public List<TreeNode> findChildrenAt(final int start) {
 		if (isLeaf()) {
 			return null;
 		}
 
 		if (getEnd() == start) {
 			return getChildren();
-		} else {
-			for (Tree child : getChildren()) {
-				List<Tree> children = child.findChildrenAt(start);
-				if (children != null) {
-					return children;
-				}
-			}
-			return null;
 		}
+
+		for (TreeNode child : getChildren()) {
+			List<TreeNode> children = child.findChildrenAt(start);
+			if (children != null) {
+				return children;
+			}
+		}
+
+		return null;
 	}
 }

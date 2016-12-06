@@ -41,21 +41,21 @@ public class CombinationSearcher {
 			throw new IllegalArgumentException("Dictionary list is empty");
 		}
 
-		Tree treeRoot = new Tree(-1, "");
+		TreeNode treeRoot = new TreeNode(-1, "");
 		createChildren(target, dictionary, treeRoot, 0);
 		ArrayList<String> lCombinations = new ArrayList<>();
 		getCombinations(target.length(), treeRoot, new StringBuilder(), lCombinations);
 		return lCombinations;
 	}
 
-	private void createChildren(final String target, final Set<String> dictionary, final Tree parent, final int start) {
+	private void createChildren(final String target, final Set<String> dictionary, final TreeNode parent, final int start) {
 		int maxLength = target.length() - start;
 		for (int length = 1; length <= maxLength; length++) {
 			String substring = target.substring(start, start + length);
 			if (dictionary.contains(substring)) {
-				Tree treeNode = new Tree(start, substring);
+				TreeNode treeNode = new TreeNode(start, substring);
 				//search for tree children that starts with current node end
-				List<Tree> children = parent.findChildrenAt(treeNode.getEnd());
+				List<TreeNode> children = parent.findChildrenAt(treeNode.getEnd());
 				if (children != null) {
 					//get already created children
 					treeNode.getChildren().addAll(children);
@@ -66,15 +66,16 @@ public class CombinationSearcher {
 				parent.addChild(treeNode);
 			}
 		}
-
-		return;
 	}
 
-	private void getCombinations(final int targetLength, final Tree partsTree, final StringBuilder parentCombination,
+	private void getCombinations(final int targetLength, final TreeNode treeRoot, final StringBuilder parentCombination,
 	                             final ArrayList<String> combinations) {
-		for (Tree child : partsTree.getChildren()) {
+		for (TreeNode child : treeRoot.getChildren()) {
 			StringBuilder childCombination = new StringBuilder(parentCombination);
-			childCombination.append(" ").append(child.getValue());
+			if (childCombination.length() > 0) {
+				childCombination.append(" ");
+			}
+			childCombination.append(child.getValue());
 			if (!child.isLeaf()) {
 				getCombinations(targetLength, child, childCombination, combinations);
 			} else if (isValidLeaf(targetLength, child)) {
@@ -83,7 +84,7 @@ public class CombinationSearcher {
 		}
 	}
 
-	private boolean isValidLeaf(final int targetLength, final Tree leaf) {
+	private boolean isValidLeaf(final int targetLength, final TreeNode leaf) {
 		if (!leaf.isLeaf()) {
 			throw new IllegalArgumentException("Not a leaf");
 		}

@@ -1,5 +1,6 @@
-package com.company;
+package test.java.com.company;
 
+import com.company.CombinationSearcher;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,7 +23,7 @@ public class CombinationSearcherTest {
 	}
 
 	@Test
-	public void testFirstExample() {
+	public void shouldFindThreeCombinations() {
 		Set<String> dictionary = new HashSet<>();
 		dictionary.add("abc");
 		dictionary.add("ab");
@@ -33,10 +34,13 @@ public class CombinationSearcherTest {
 		String target = "aabc";
 		List<String> combinations = combinationSearcher.findCombinations(target, dictionary);
 		assertEquals(3, combinations.size());
+		assertEquals(target, combinations.get(0).replace(" ", ""));
+		assertEquals(target, combinations.get(1).replace(" ", ""));
+		assertEquals(target, combinations.get(2).replace(" ", ""));
 	}
 
 	@Test
-	public void testSecondExample() {
+	public void shouldNotFindCombinations() {
 		Set<String> dictionary = new HashSet<>();
 		dictionary.add("abc");
 		dictionary.add("ab");
