@@ -1,7 +1,5 @@
 package com.company;
 
-import javafx.util.Pair;
-
 import java.util.*;
 
 public class CombinationSearcher {
@@ -95,28 +93,20 @@ public class CombinationSearcher {
 
 	private List<String> getCombinations(final int targetLength, final TreeNode treeRoot) {
 		final List<String> combinations = new ArrayList<>();
-		final List<String> combination = new LinkedList<>();
-
-		Stack<TreeNode.IterationData> dataStack = new Stack<>();
-		TreeNode.IterationData data = new TreeNode.IterationData(treeRoot);
+		StringBuilder combinationStringBuilder = new StringBuilder();
+		Stack<IterationData> dataStack = new Stack<>();
+		IterationData data = new IterationData(treeRoot, combinationStringBuilder.length());
 
 		while (data.node != null) {
 			if (data.node.getChildren().size() > data.position) {
 				dataStack.push(data);
-				data = new TreeNode.IterationData(data.node.getChildren().get(data.position));
-				combination.add(data.node.getValue());
+				data = new IterationData(data.node.getChildren().get(data.position), combinationStringBuilder.length());
+				combinationStringBuilder.append(data.node.getValue()).append(" ");
 				continue;
 			}
 
 			if (data.node.isLeaf()) {
 				if (isValidLeaf(targetLength, data.node)) {
-					StringBuilder combinationStringBuilder = new StringBuilder();
-					for (String item : combination) {
-						if (combinationStringBuilder.length() > 0) {
-							combinationStringBuilder.append(" ");
-						}
-						combinationStringBuilder.append(item);
-					}
 					combinations.add(combinationStringBuilder.toString());
 				}
 			}
@@ -124,7 +114,7 @@ public class CombinationSearcher {
 			if (data.node.getStart() == -1) {
 				break;
 			}
-			combination.remove(combination.size() - 1);
+			combinationStringBuilder.delete(data.start, combinationStringBuilder.length());
 			data = dataStack.pop();
 			data.position++;
 		}
@@ -146,6 +136,17 @@ public class CombinationSearcher {
 
 		public ChildCreationData(TreeNode parent, int start) {
 			this.parent = parent;
+			this.start = start;
+		}
+	}
+
+	private static class IterationData {
+		public final TreeNode node;
+		public int position;
+		public final int start;
+
+		public IterationData(TreeNode node, int start) {
+			this.node = node;
 			this.start = start;
 		}
 	}

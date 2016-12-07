@@ -1,8 +1,5 @@
 package com.company;
 
-import javafx.util.Pair;
-
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -69,7 +66,7 @@ public class TreeNode {
 		return null;
 	}
 
-	public static class IterationData {
+	private static class IterationData {
 		public final TreeNode node;
 		public int position;
 
