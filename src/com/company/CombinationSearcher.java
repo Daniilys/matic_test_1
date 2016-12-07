@@ -12,7 +12,7 @@ public class CombinationSearcher {
 		dictionary.add("b");
 		dictionary.add("c");
 
-		String target = "abcabcabcabc";
+		String target = "abcabcabcabcabcabcabcabc";
 		List<String> combinations = new CombinationSearcher().findCombinations(target, dictionary);
 		for (String combination : combinations) {
 			System.out.println(combination);
@@ -53,13 +53,13 @@ public class CombinationSearcher {
 
 	private TreeNode createChildren(final String target, final Set<String> dictionary) {
 		TreeNode treeRoot = new TreeNode(-1, "");
-		Stack<ChildCreationData> dataStack = new Stack<>();
-		ChildCreationData data = new ChildCreationData(treeRoot, 0);
+		LinkedList<ChildrenCreationStep> dataStack = new LinkedList<>();
+		ChildrenCreationStep data = new ChildrenCreationStep(treeRoot, 0);
 
 		while (data != null) {
 			String substring = target.substring(data.start, data.start + data.length);
-			TreeNode treeNode = new TreeNode(data.start, substring);
 			if (dictionary.contains(substring)) {
+				TreeNode treeNode = new TreeNode(data.start, substring);
 				data.parent.addChild(treeNode);
 				//search for tree children that starts with current node end
 				List<TreeNode> children = data.parent.findChildrenAt(treeNode.getEnd());
@@ -71,7 +71,7 @@ public class CombinationSearcher {
 					}
 				} else {
 					dataStack.push(data);
-					data = new ChildCreationData(treeNode, treeNode.getEnd());
+					data = new ChildrenCreationStep(treeNode, treeNode.getEnd());
 				}
 			} else {
 				data.length++;
@@ -94,7 +94,7 @@ public class CombinationSearcher {
 	private List<String> getCombinations(final int targetLength, final TreeNode treeRoot) {
 		final List<String> combinations = new ArrayList<>();
 		StringBuilder combinationStringBuilder = new StringBuilder();
-		Stack<IterationData> dataStack = new Stack<>();
+		LinkedList<IterationData> dataStack = new LinkedList<>();
 		IterationData data = new IterationData(treeRoot, combinationStringBuilder.length());
 
 		while (data.node != null) {
@@ -129,12 +129,12 @@ public class CombinationSearcher {
 		return leaf.getEnd() == targetLength;
 	}
 
-	private static class ChildCreationData {
+	private static class ChildrenCreationStep {
 		public final TreeNode parent;
 		public final int start;
 		public int length = 1;
 
-		public ChildCreationData(TreeNode parent, int start) {
+		public ChildrenCreationStep(TreeNode parent, int start) {
 			this.parent = parent;
 			this.start = start;
 		}

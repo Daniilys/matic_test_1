@@ -42,7 +42,7 @@ public class TreeNode {
 	}
 
 	public List<TreeNode> findChildrenAt(final int start) {
-		Stack<IterationData> stack = new Stack<>();
+		LinkedList<IterationData> stack = new LinkedList<>();
 		IterationData data = new IterationData(this);
 
 		while (data.node != null) {
