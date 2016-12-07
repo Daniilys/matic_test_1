@@ -1,5 +1,7 @@
 package com.company;
 
+import javafx.util.Pair;
+
 import java.util.*;
 
 public class CombinationSearcher {
@@ -12,7 +14,7 @@ public class CombinationSearcher {
 		dictionary.add("b");
 		dictionary.add("c");
 
-		String target = "abcabacca";
+		String target = "abcabc";
 		List<String> combinations = new CombinationSearcher().findCombinations(target, dictionary);
 		for (String combination : combinations) {
 			System.out.println(combination);
@@ -41,47 +43,90 @@ public class CombinationSearcher {
 			throw new IllegalArgumentException("Dictionary list is empty");
 		}
 
-		TreeNode treeRoot = new TreeNode(-1, "");
-		createChildren(target, dictionary, treeRoot, 0);
-		ArrayList<String> combinations = new ArrayList<>();
-		getCombinations(target.length(), treeRoot, new StringBuilder(), combinations);
-		return combinations;
+
+		TreeNode treeRoot = createChildren(target, dictionary);
+		return getCombinations(target.length(), treeRoot);
 	}
 
-	private void createChildren(final String target, final Set<String> dictionary, final TreeNode parent, final int start) {
-		int maxLength = target.length() - start;
-		for (int length = 1; length <= maxLength; length++) {
-			String substring = target.substring(start, start + length);
+	private TreeNode createChildren(final String target, final Set<String> dictionary) {
+		TreeNode treeRoot = new TreeNode(-1, "");
+		Stack<ChildCreationData> dataStack = new Stack<>();
+		ChildCreationData data = new ChildCreationData(treeRoot, 0);
+
+		while (data != null) {
+			String substring = target.substring(data.start, data.start + data.length);
+			TreeNode treeNode = new TreeNode(data.start, substring);
 			if (dictionary.contains(substring)) {
-				TreeNode treeNode = new TreeNode(start, substring);
+				data.parent.addChild(treeNode);
 				//search for tree children that starts with current node end
-				List<TreeNode> children = parent.findChildrenAt(treeNode.getEnd());
+				List<TreeNode> children = data.parent.findChildrenAt(treeNode.getEnd());
 				if (children != null) {
 					//get already created children
 					treeNode.getChildren().addAll(children);
+					if (data.start + data.length < target.length()) {
+						data.length++;
+					}
 				} else {
-					//create children for that node
-					createChildren(target, dictionary, treeNode, treeNode.getEnd());
+					dataStack.push(data);
+					data = new ChildCreationData(treeNode, treeNode.getEnd());
 				}
-				parent.addChild(treeNode);
+			} else {
+				data.length++;
+			}
+
+			while (data.start + data.length > target.length()) {
+				if (dataStack.isEmpty()) {
+					data = null;
+					break;
+				} else {
+					data = dataStack.pop();
+					data.length++;
+				}
 			}
 		}
+
+		return treeRoot;
 	}
 
-	private void getCombinations(final int targetLength, final TreeNode treeRoot, final StringBuilder parentCombination,
-	                             final ArrayList<String> combinations) {
-		for (TreeNode child : treeRoot.getChildren()) {
-			StringBuilder childCombination = new StringBuilder(parentCombination);
-			if (childCombination.length() > 0) {
-				childCombination.append(" ");
+	private List<String> getCombinations(final int targetLength, final TreeNode treeRoot) {
+		final List<String> combinations = new ArrayList<>();
+		final List<String> combination = new LinkedList<>();
+		Stack<Pair<TreeNode, Integer>> dataStack = new Stack<>();
+		TreeNode parent = treeRoot;
+		int position = 0;
+
+		while (parent != null) {
+			if (parent.getChildren().size() > position) {
+				dataStack.push(new Pair<>(parent, position));
+				parent = parent.getChildren().get(position);
+				position = 0;
+				combination.add(parent.getValue());
+				continue;
 			}
-			childCombination.append(child.getValue());
-			if (!child.isLeaf()) {
-				getCombinations(targetLength, child, childCombination, combinations);
-			} else if (isValidLeaf(targetLength, child)) {
-				combinations.add(childCombination.toString());
+
+			if (parent.isLeaf()) {
+				if (isValidLeaf(targetLength, parent)) {
+					StringBuilder combinationStringBuilder = new StringBuilder();
+					for (String item : combination) {
+						if (combinationStringBuilder.length() > 0) {
+							combinationStringBuilder.append(" ");
+						}
+						combinationStringBuilder.append(item);
+					}
+					combinations.add(combinationStringBuilder.toString());
+				}
 			}
+
+			if (parent.getStart() == -1) {
+				break;
+			}
+			combination.remove(combination.size() - 1);
+			Pair<TreeNode, Integer> pair = dataStack.pop();
+			parent = pair.getKey();
+			position = pair.getValue() + 1;
 		}
+
+		return combinations;
 	}
 
 	private boolean isValidLeaf(final int targetLength, final TreeNode leaf) {
@@ -89,6 +134,17 @@ public class CombinationSearcher {
 			throw new IllegalArgumentException("Not a leaf");
 		}
 		return leaf.getEnd() == targetLength;
+	}
+
+	private static class ChildCreationData {
+		public final TreeNode parent;
+		public final int start;
+		public int length = 1;
+
+		public ChildCreationData(TreeNode parent, int start) {
+			this.parent = parent;
+			this.start = start;
+		}
 	}
 
 }

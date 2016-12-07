@@ -1,7 +1,11 @@
 package com.company;
 
+import javafx.util.Pair;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Created by mahasamatman on 05/12/16.
@@ -41,19 +45,28 @@ public class TreeNode {
 	}
 
 	public List<TreeNode> findChildrenAt(final int start) {
-		if (isLeaf()) {
-			return null;
-		}
+		Stack<Pair<TreeNode, Integer>> stack = new Stack<>();
+		TreeNode node = this;
+		int position = 0;
 
-		if (getEnd() == start) {
-			return getChildren();
-		}
-
-		for (TreeNode child : getChildren()) {
-			List<TreeNode> children = child.findChildrenAt(start);
-			if (children != null) {
-				return children;
+		while (node != null) {
+			if (node.isLeaf()) {
+				return null;
 			}
+			if (node.getEnd() == start) {
+				return node.getChildren();
+			}
+
+			if (node.getChildren().size() > position) {
+				stack.push(new Pair<>(node, position));
+				node = node.getChildren().get(position);
+				position = 0;
+				continue;
+			}
+
+			Pair<TreeNode, Integer> pair = stack.pop();
+			node = pair.getKey();
+			position = pair.getValue() + 1;
 		}
 
 		return null;
