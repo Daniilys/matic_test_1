@@ -43,12 +43,7 @@ public class CombinationSearcher {
 
 
 		TreeNode treeRoot = createChildren(target, dictionary);
-		long startTime = System.nanoTime();
-		List<String> combinations = getCombinations(target.length(), treeRoot);
-		long endTime = System.nanoTime();
-		long duration = (endTime - startTime);
-		System.out.println(duration/1000);
-		return combinations;
+		return getCombinations(target.length(), treeRoot);
 	}
 
 	private TreeNode createChildren(final String target, final Set<String> dictionary) {
