@@ -45,30 +45,36 @@ public class TreeNode {
 	}
 
 	public List<TreeNode> findChildrenAt(final int start) {
-		Stack<Pair<TreeNode, Integer>> stack = new Stack<>();
-		TreeNode node = this;
-		int position = 0;
+		Stack<IterationData> stack = new Stack<>();
+		IterationData data = new IterationData(this);
 
-		while (node != null) {
-			if (node.isLeaf()) {
+		while (data.node != null) {
+			if (data.node.isLeaf()) {
 				return null;
 			}
-			if (node.getEnd() == start) {
-				return node.getChildren();
+			if (data.node.getEnd() == start) {
+				return data.node.getChildren();
 			}
 
-			if (node.getChildren().size() > position) {
-				stack.push(new Pair<>(node, position));
-				node = node.getChildren().get(position);
-				position = 0;
+			if (data.node.getChildren().size() > data.position) {
+				stack.push(data);
+				data = new IterationData(data.node.getChildren().get(data.position));
 				continue;
 			}
 
-			Pair<TreeNode, Integer> pair = stack.pop();
-			node = pair.getKey();
-			position = pair.getValue() + 1;
+			data = stack.pop();
+			data.position++;
 		}
 
 		return null;
+	}
+
+	public static class IterationData {
+		public final TreeNode node;
+		public int position;
+
+		public IterationData(TreeNode node) {
+			this.node = node;
+		}
 	}
 }

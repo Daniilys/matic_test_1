@@ -14,7 +14,7 @@ public class CombinationSearcher {
 		dictionary.add("b");
 		dictionary.add("c");
 
-		String target = "abcabc";
+		String target = "abcabcabcabc";
 		List<String> combinations = new CombinationSearcher().findCombinations(target, dictionary);
 		for (String combination : combinations) {
 			System.out.println(combination);
@@ -45,7 +45,12 @@ public class CombinationSearcher {
 
 
 		TreeNode treeRoot = createChildren(target, dictionary);
-		return getCombinations(target.length(), treeRoot);
+		long startTime = System.nanoTime();
+		List<String> combinations = getCombinations(target.length(), treeRoot);
+		long endTime = System.nanoTime();
+		long duration = (endTime - startTime);
+		System.out.println(duration/1000);
+		return combinations;
 	}
 
 	private TreeNode createChildren(final String target, final Set<String> dictionary) {
@@ -91,21 +96,20 @@ public class CombinationSearcher {
 	private List<String> getCombinations(final int targetLength, final TreeNode treeRoot) {
 		final List<String> combinations = new ArrayList<>();
 		final List<String> combination = new LinkedList<>();
-		Stack<Pair<TreeNode, Integer>> dataStack = new Stack<>();
-		TreeNode parent = treeRoot;
-		int position = 0;
 
-		while (parent != null) {
-			if (parent.getChildren().size() > position) {
-				dataStack.push(new Pair<>(parent, position));
-				parent = parent.getChildren().get(position);
-				position = 0;
-				combination.add(parent.getValue());
+		Stack<TreeNode.IterationData> dataStack = new Stack<>();
+		TreeNode.IterationData data = new TreeNode.IterationData(treeRoot);
+
+		while (data.node != null) {
+			if (data.node.getChildren().size() > data.position) {
+				dataStack.push(data);
+				data = new TreeNode.IterationData(data.node.getChildren().get(data.position));
+				combination.add(data.node.getValue());
 				continue;
 			}
 
-			if (parent.isLeaf()) {
-				if (isValidLeaf(targetLength, parent)) {
+			if (data.node.isLeaf()) {
+				if (isValidLeaf(targetLength, data.node)) {
 					StringBuilder combinationStringBuilder = new StringBuilder();
 					for (String item : combination) {
 						if (combinationStringBuilder.length() > 0) {
@@ -117,13 +121,12 @@ public class CombinationSearcher {
 				}
 			}
 
-			if (parent.getStart() == -1) {
+			if (data.node.getStart() == -1) {
 				break;
 			}
 			combination.remove(combination.size() - 1);
-			Pair<TreeNode, Integer> pair = dataStack.pop();
-			parent = pair.getKey();
-			position = pair.getValue() + 1;
+			data = dataStack.pop();
+			data.position++;
 		}
 
 		return combinations;
